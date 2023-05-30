@@ -112,3 +112,74 @@ Si la connexion est établie avec succès, une recherche d'objets est effectuée
 Le nombre d'entrées trouvées est affiché, suivi d'un tableau qui affiche les attributs "cn" (nom commun) et "userpassword" de chaque entrée retournée.
 
 ### Voir fichier Acces.php et ClasseLDAP
+
+## Authentification Via LDAP php
+Tout d'abord nous alons créer un formulaire PHP
+```
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title >Login</title>
+
+</head>
+<body>
+	<p style="center">Login</p>
+
+	<form action="identification.php" id="idFormLog" method="get">
+		<table>
+			<tr>
+				<td>Login:</td><td><input id="idname" name="login" value=""></td>
+			</tr>
+			<tr>
+				<td>Mot de passe:</td>
+				<td><input id="idmdp" Name="mdp" type="password" value=""></td>
+			</tr>
+
+		</table>
+        <button>Envoi</button>
+	</form>
+</body>
+</html>
+```
+Puis après dans le fichier identification 
+
+```
+<!DOCTYPE html>
+<html>
+<?php
+		require_once("ClasseLDAP.php");
+		$monldap = new annuaire("10.108.80.3");  // instanciation de la classe (avec l'adresse du serveur ldap)
+
+
+		//identification
+		$dn="uid=".$_GET['login'].",ou=RT2,o=RT,c=Annecy,dc=univ-savoie,dc=iut";
+		$passwd = $_GET["mdp"];
+
+		if (!($monldap->ouverture($dn,$passwd))) {
+	
+			print ("<h4>Impossible de s'authentifier au serveur LDAP.</h4>");
+            header("Location:pageErreur.html"); 
+			}
+			
+			
+		else {
+			$filtre="objectclass=person";  // on recherche toutes les personnes
+						//$filtre="sn=A*";             // on recherche tous les nom commencant par A
+			echo "Recherche des objets avec le filtre : ".$filtre."<br>";
+			//lance la recherche
+			$n = $monldap->recherche("dc=univ-savoie,dc=iut",$filtre);
+			header("Location:page1.html");
+
+			if ($n==0) {
+				print ("<h4>Il n'y a aucune réponse à la recherche demandée.</h4>");
+				
+			}
+		}
+	?>
+
+<body>
+</body>
+</html>
+```
+En fonction de la réussite cela redirige vers la bonne page
