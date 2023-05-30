@@ -183,3 +183,70 @@ Puis après dans le fichier identification
 </html>
 ```
 En fonction de la réussite cela redirige vers la bonne page
+
+### Modifier mot de passe
+On va d'abord créer une page d'authentification
+```
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title >Login</title>
+
+</head>
+<body>
+	<p style="center">Changement de MDP</p>
+
+	<form action="identificationChangeMDP.php" id="idFormLog" method="get">
+		<table>
+			<tr>
+				<td>Login:</td><td><input id="idname" name="login" value=""></td>
+			</tr>
+			<tr>
+				<td>Mot de passe:</td>
+				<td><input id="idmdp" Name="mdp" type="password" value=""></td>
+			</tr>
+			<tr>
+				<td>Nouveau mot de passe:</td>
+				<td><input id="idmdp" Name="newmdp" type="password" value=""></td>
+			</tr>
+
+		</table>
+        <button>Changer le MDP</button>
+	</form>
+</body>
+</html>
+```
+Puis dans la page IdentificationChangeMDP
+
+```
+<!DOCTYPE html>
+<html>
+<?php
+		require_once("ClasseLDAP.php");
+		$monldap = new annuaire("10.108.80.3");  // instanciation de la classe (avec l'adresse du serveur ldap)
+
+
+		//identification
+		$dn="uid=".$_GET['login'].",ou=RT2,o=RT,c=Annecy,dc=univ-savoie,dc=iut";
+		$passwd = $_GET["mdp"];
+		$newpasswd = $_GET["newmdp"];
+
+		if (!($monldap->ouverture($dn,$passwd))) {
+	
+			print ("<h4>Impossible de s'authentifier au serveur LDAP.</h4>");
+            header("Location:pageErreur.html"); 
+			}
+			
+			
+		else {
+			$monldap->setPassword($newpasswd);
+		}
+	?>
+
+<body>
+</body>
+
+</html>
+```
+Et redirige vers la bonne page
